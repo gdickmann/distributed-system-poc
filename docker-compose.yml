@@ -1,0 +1,12 @@
+services:
+  dotnet:
+    build:
+      context: ./dotnet
+    ports:
+      - "5001:8080"
+
+  flask:
+    build:
+      context: ./python
+    ports:
+      - "5000:5000"
