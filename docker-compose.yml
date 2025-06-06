@@ -1,4 +1,13 @@
 services:
+
+  database:
+    image: postgres
+    environment:
+        POSTGRES_PASSWORD: postgres        
+    ports:
+        - "5432:5432"
+    container_name: "postgres"
+
   dotnet:
     build:
       context: ./dotnet
