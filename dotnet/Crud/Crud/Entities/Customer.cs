@@ -1,8 +1,8 @@
 ﻿namespace Crud.Entities
 {
-    public class Carrier
+    public class Customer
     {
         public Guid Id { get; init; } = Guid.NewGuid();
-        public Driver? Driver { get; }
+        public Route? Route { get; }
     }
 }
