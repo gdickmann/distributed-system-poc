@@ -2,12 +2,14 @@
 
 namespace Crud.Entities
 {
-    public class Carrier
+    public class Product
     {
         public Guid Id { get; init; } = Guid.NewGuid();
         public required string Name { get; set; }
-
+        public required Guid ProductKindId { get; set; }
         [JsonIgnore]
-        public Driver? Driver { get; }
+        public ProductKind? ProductKind { get; init; }
+        [JsonIgnore]
+        public Route? Route { get; init; }
     }
 }
