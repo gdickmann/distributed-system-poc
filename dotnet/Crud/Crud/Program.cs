@@ -10,7 +10,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<CrudContext>();
 
 CrudContext context = new();
-context.Database.EnsureDeleted();
 context.Database.EnsureCreated();
 
 var app = builder.Build();
