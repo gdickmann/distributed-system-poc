@@ -1,12 +1,18 @@
-﻿namespace Crud.Entities
+﻿using System.Text.Json.Serialization;
+
+namespace Crud.Entities
 {
     public class Driver
     {
-        public required Guid Id { get; init; } = Guid.NewGuid();
-        public required Guid VehicleId { get; init; }
+        public Guid Id { get; init; } = Guid.NewGuid();
+        public required string Name { get; set; }
+        public required Guid VehicleId { get; set; }
         public required Guid CarrierId { get; set; }
-        public required Vehicle Vehicle { get; init; }
-        public required Carrier Carrier { get; init; }
+        [JsonIgnore]
+        public Vehicle? Vehicle { get; init; }
+        [JsonIgnore]
+        public Carrier? Carrier { get; init; }
+        [JsonIgnore]
         public Route? Route { get; }
     }
 }

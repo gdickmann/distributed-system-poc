@@ -56,9 +56,92 @@ app.MapPut("/carriers/{id}", async (Guid id, [FromBody] CarrierRequest request) 
 #endregion
 
 #region Customer
+app.MapGet("/customers", () =>
+{
+    var customers = context.Customers.Select(x => x);
+    return customers.Any() ? Results.Ok(customers) : Results.NotFound();
+
+}).WithSummary($"Retrieves the {nameof(Customer)} entity from the database.");
+
+app.MapGet("/customers/{id}", (Guid id) =>
+{
+    var customer = context.Customers.FirstOrDefault(x => x.Id.Equals(id));
+    return customer is not null ? Results.Ok(customer) : Results.NotFound();
+
+}).WithSummary($"Retrieves the {nameof(Customer)} entity from the database with the specified id.");
+
+app.MapPost("/customers", async ([FromBody] CustomerRequest request) =>
+{
+    Customer customer = new() { Name = request.Name };
+
+    await context.Customers.AddAsync(customer);
+    await context.SaveChangesAsync();
+
+    return Results.Ok(customer);
+}).WithSummary($"Adds a {nameof(Customer)} into the database.");
+
+app.MapPut("/customers/{id}", async (Guid id, [FromBody] CustomerRequest request) =>
+{
+    var customer = context.Customers.FirstOrDefault(x => x.Id.Equals(id));
+    if (customer is null) return Results.NotFound();
+
+    customer.Name = request.Name;
+    await context.SaveChangesAsync();
+
+    return Results.NoContent();
+}).WithSummary($"Updates a {nameof(Customer)} into the database.");
 #endregion
 
 #region Driver
+app.MapGet("/drivers", () =>
+{
+    var drivers = context.Drivers.Select(x => x);
+    return drivers.Any() ? Results.Ok(drivers) : Results.NotFound();
+
+}).WithSummary($"Retrieves the {nameof(Driver)} entity from the database.");
+
+app.MapGet("/drivers/{id}", (Guid id) =>
+{
+    var driver = context.Drivers.FirstOrDefault(x => x.Id.Equals(id));
+    return driver is not null ? Results.Ok(driver) : Results.NotFound();
+
+}).WithSummary($"Retrieves the {nameof(Driver)} entity from the database with the specified id.");
+
+app.MapPost("/drivers", async ([FromBody] DriverRequest request) =>
+{
+    Carrier? carrier = context.Carriers.FirstOrDefault(x => x.Id.Equals(request.CarrierId));
+    if (carrier is null) return Results.BadRequest($"Entidade {nameof(Carrier)} de id {request.CarrierId} não foi encontrada na base de dados.");
+
+    Vehicle? vehicle = context.Vehicles.FirstOrDefault(x => x.Id.Equals(request.VehicleId));
+    if (vehicle is null) return Results.BadRequest($"Entidade {nameof(Vehicle)} de id {request.VehicleId} não foi encontrada na base de dados.");
+
+    Driver driver = new() { Name = request.Name, CarrierId = request.CarrierId, VehicleId = request.VehicleId };
+
+    await context.Drivers.AddAsync(driver);
+    await context.SaveChangesAsync();
+
+    return Results.Ok(driver);
+}).WithSummary($"Adds a {nameof(Driver)} into the database.");
+
+app.MapPut("/drivers/{id}", async (Guid id, [FromBody] DriverRequest request) =>
+{
+    var driver = context.Drivers.FirstOrDefault(x => x.Id.Equals(id));
+    if (driver is null) return Results.NotFound();
+
+    Carrier? carrier = context.Carriers.FirstOrDefault(x => x.Id.Equals(request.CarrierId));
+    if (carrier is null) return Results.BadRequest($"Entidade {nameof(Carrier)} de id {request.CarrierId} não foi encontrada na base de dados.");
+
+    Vehicle? vehicle = context.Vehicles.FirstOrDefault(x => x.Id.Equals(request.VehicleId));
+    if (vehicle is null) return Results.BadRequest($"Entidade {nameof(Vehicle)} de id {request.VehicleId} não foi encontrada na base de dados.");
+
+    driver.Name = request.Name;
+    driver.CarrierId = request.CarrierId;
+    driver.VehicleId = request.VehicleId;
+
+    await context.SaveChangesAsync();
+
+    return Results.NoContent();
+}).WithSummary($"Updates a {nameof(Customer)} into the database.");
 #endregion
 
 #region Product
