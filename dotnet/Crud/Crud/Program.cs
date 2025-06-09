@@ -141,13 +141,86 @@ app.MapPut("/drivers/{id}", async (Guid id, [FromBody] DriverRequest request) =>
     await context.SaveChangesAsync();
 
     return Results.NoContent();
-}).WithSummary($"Updates a {nameof(Customer)} into the database.");
+}).WithSummary($"Updates a {nameof(Driver)} into the database.");
 #endregion
 
 #region Product
+app.MapGet("/products", () =>
+{
+    var products = context.Products.Select(x => x);
+    return products.Any() ? Results.Ok(products) : Results.NotFound();
+}).WithSummary($"Retrieves the {nameof(Product)} entity from the database.");
+
+app.MapGet("/products/{id}", (Guid id) =>
+{
+    var product = context.Products.FirstOrDefault(x => x.Id.Equals(id));
+    return product is not null ? Results.Ok(product) : Results.NotFound();
+}).WithSummary($"Retrieves the {nameof(Product)} entity from the database with the specified id.");
+
+app.MapPost("/products", async ([FromBody] ProductRequest request) =>
+{
+    ProductKind? productKind = context.ProductKinds.FirstOrDefault(x => x.Id.Equals(request.ProductKindId));
+    if (productKind is null) return Results.BadRequest($"Entidade {nameof(ProductKind)} de id {request.ProductKindId} não foi encontrada na base de dados.");
+
+    Product product = new() { Name = request.Name, ProductKindId = request.ProductKindId };
+
+    await context.Products.AddAsync(product);
+    await context.SaveChangesAsync();
+
+    return Results.Ok(product);
+}).WithSummary($"Adds a {nameof(Product)} into the database.");
+
+app.MapPut("/products/{id}", async (Guid id, [FromBody] ProductRequest request) =>
+{
+    var product = context.Products.FirstOrDefault(x => x.Id.Equals(id));
+    if (product is null) return Results.NotFound();
+
+    ProductKind? productKind = context.ProductKinds.FirstOrDefault(x => x.Id.Equals(request.ProductKindId));
+    if (productKind is null) return Results.BadRequest($"Entidade {nameof(ProductKind)} de id {request.ProductKindId} não foi encontrada na base de dados.");
+
+    product.Name = request.Name;
+    product.ProductKindId = request.ProductKindId;
+
+    await context.SaveChangesAsync();
+
+    return Results.NoContent();
+}).WithSummary($"Updates a {nameof(Driver)} into the database.");
 #endregion
 
 #region ProductKind
+app.MapGet("/product-kinds", () =>
+{
+    var productKinds = context.ProductKinds.Select(x => x);
+    return productKinds.Any() ? Results.Ok(productKinds) : Results.NotFound();
+}).WithSummary($"Retrieves the {nameof(ProductKind)} entity from the database.");
+
+app.MapGet("/product-kinds/{id}", (Guid id) =>
+{
+    var productKind = context.ProductKinds.FirstOrDefault(x => x.Id.Equals(id));
+    return productKind is not null ? Results.Ok(productKind) : Results.NotFound();
+}).WithSummary($"Retrieves the {nameof(ProductKind)} entity from the database with the specified id.");
+
+app.MapPost("/product-kinds", async ([FromBody] ProductKindRequest request) =>
+{
+    ProductKind productKind = new() { Name = request.Name };
+
+    await context.ProductKinds.AddAsync(productKind);
+    await context.SaveChangesAsync();
+
+    return Results.Ok(productKind);
+}).WithSummary($"Adds a {nameof(ProductKind)} into the database.");
+
+app.MapPut("/product-kinds/{id}", async (Guid id, [FromBody] ProductKindRequest request) =>
+{
+    ProductKind? productKind = context.ProductKinds.FirstOrDefault(x => x.Id.Equals(request.Name));
+    if (productKind is null) return Results.NotFound();
+
+    productKind.Name = request.Name;
+
+    await context.SaveChangesAsync();
+
+    return Results.NoContent();
+}).WithSummary($"Updates a {nameof(ProductKind)} into the database.");
 #endregion
 
 #region Recipient

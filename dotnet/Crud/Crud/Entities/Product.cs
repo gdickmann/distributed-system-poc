@@ -1,10 +1,15 @@
-﻿namespace Crud.Entities
+﻿using System.Text.Json.Serialization;
+
+namespace Crud.Entities
 {
     public class Product
     {
         public Guid Id { get; init; } = Guid.NewGuid();
-        public required Guid ProductKindId { get; init; }
-        public required ProductKind ProductKind { get; init; }
+        public required string Name { get; set; }
+        public required Guid ProductKindId { get; set; }
+        [JsonIgnore]
+        public ProductKind? ProductKind { get; init; }
+        [JsonIgnore]
         public Route? Route { get; init; }
     }
 }
